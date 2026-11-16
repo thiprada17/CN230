@@ -68,3 +68,4 @@ export default function KpiBentoRow({ products, input, yieldKg, ghg, hasGhgData 
     </div>
   );
 }
+
