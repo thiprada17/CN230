@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: agri_lci_postgres
+    restart: unless-stopped
+    working_dir: /
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agri_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agri_admin_password}
+      POSTGRES_DB: ${POSTGRES_DB:-agri_lci}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/schema:/docker-entrypoint-initdb.d/schema:ro
+      - ./sql/schema:/schema:ro
+      - ./sql/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      - ./sql/seed_khomkaew_rice_milling.sql:/docker-entrypoint-initdb.d/03-seed-khomkaew-rice-milling.sql:ro
+      - ./sql/seed_rice_milling_unido.sql:/docker-entrypoint-initdb.d/04-seed-rice-milling-unido.sql:ro
+      - ./sql/seed_cassava.sql:/docker-entrypoint-initdb.d/05-seed-cassava.sql:ro
+      - ./sql/seed_cassava_cultivation.sql:/docker-entrypoint-initdb.d/06-seed-cassava-cultivation.sql:ro
+      - ./sql/seed_maize.sql:/docker-entrypoint-initdb.d/07-seed-maize.sql:ro
+      - ./sql/seed_sugarcane.sql:/docker-entrypoint-initdb.d/08-seed-sugarcane.sql:ro
+      - ./sql/seed_sugarcane_completion.sql:/docker-entrypoint-initdb.d/09-seed-sugarcane-completion.sql:ro
+      - ./sql/seed_sugarcane_byproducts.sql:/docker-entrypoint-initdb.d/10-seed-sugarcane-byproducts.sql:ro
+      - ./sql/seed_pineapple.sql:/docker-entrypoint-initdb.d/11-seed-pineapple.sql:ro
+      - ./sql/seed_pineapple_byproducts.sql:/docker-entrypoint-initdb.d/12-seed-pineapple-byproducts.sql:ro
+      - ./sql/audit_product_completeness.sql:/docker-entrypoint-initdb.d/13-audit-product-completeness.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agri_admin} -d ${POSTGRES_DB:-agri_lci}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  postgres_data:
